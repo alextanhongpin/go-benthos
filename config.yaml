@@ -1,0 +1,18 @@
+input:
+  csv:
+    paths: [./test.csv]
+    parse_header_row: true
+    delimiter: ','
+
+pipeline:
+  processors:
+    - bloblang: |
+        root = "INSERT INTO users(name) VALUES ('%s');".format(this.foo)
+        #root.foo = this.foo.uppercase()
+        #root.bar = this.bar
+
+output:
+  file:
+    path: "./out.sql"
+    codec: lines
+  #type: stdout
