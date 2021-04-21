@@ -7,7 +7,7 @@ input:
 pipeline:
   processors:
     - bloblang: |
-        root = "INSERT INTO users(name) VALUES ('%s');".format(this.foo)
+        root = "INSERT INTO users(name) VALUES ('%s');".format(this.foo.not_empty()) # This will throw error if foo is empty.
         #root.foo = this.foo.uppercase()
         #root.bar = this.bar
     - catch:
