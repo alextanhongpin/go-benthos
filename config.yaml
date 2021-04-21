@@ -10,9 +10,19 @@ pipeline:
         root = "INSERT INTO users(name) VALUES ('%s');".format(this.foo)
         #root.foo = this.foo.uppercase()
         #root.bar = this.bar
+    - catch:
+        - log:
+            message: "Processing failed due to: ${!error()}"
 
 output:
-  file:
-    path: "./out.sql"
-    codec: lines
-  #type: stdout
+  switch:
+    cases:
+      # When the environment variable dry_run=true, then print to stdout.
+      - check: env("dry_run") == "true"
+        output:
+          type: stdout
+      # Else, write to sql.
+      - output:
+          file:
+            path: "./out.sql"
+            codec: lines
