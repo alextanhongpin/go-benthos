@@ -1,0 +1,27 @@
+input:
+  generate:
+    mapping: |
+      #root = {"name": "jane", "age": "-10"}
+      root = {"name": "jessie", "age": "-10"}
+    count: 1
+
+pipeline:
+  processors:
+    - bloblang: |
+        root = match {
+          # Skip rows that has name jane.
+          this.name == "jane" => deleted(),
+
+          # Validate that the number is positive.
+          this.age.number() < 0 => throw("negative number"),
+
+          # Success.
+          _ => "INSERT INTO table(name, age) VALUES ('%s', %s)".format(
+            this.name.not_empty(),
+            this.age.not_empty().number().string()
+          )
+        }
+
+output:
+  stdout:
+    delimiter: ""
