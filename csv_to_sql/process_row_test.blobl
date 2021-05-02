@@ -1,0 +1,2 @@
+import "./process_row.blobl"
+root = this.apply("process_row")

@@ -1,0 +1,9 @@
+parallel: true
+tests:
+    - name: Example test case
+      environment: {}
+      target_processors: /pipeline/processors/0
+      input_batch:
+        - json_content: {"name": "john  ", "age": "10"}
+      output_batches:
+        - - content_equals: "INSERT INTO table(name, age) VALUES ('john', 10)"

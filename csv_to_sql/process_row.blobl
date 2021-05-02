@@ -1,0 +1,19 @@
+map process_row  {
+
+	let name = this.name.trim().not_empty().replace("'", "''")
+	root = match {
+		# Skip rows that has name jane.
+		# This will not write to the output.
+		$name == "jane" => deleted(),
+
+		# Validate that the number is positive.
+		# If there is an error, it will log to stdout.
+		this.age.number() < 0 => throw("negative number"),
+
+		# Success.
+		_ => "INSERT INTO table(name, age) VALUES ('%s', %s)".format(
+			$name,
+			this.age.trim().not_empty().number().string()
+		)
+	}
+}

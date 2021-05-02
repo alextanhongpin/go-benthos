@@ -1,0 +1,10 @@
+# Generate a single row of json and print it out to stdout.
+input:
+  generate:
+    mapping: |
+      root = {"name": "john", "age": 10}
+    count: 1
+
+output:
+  stdout:
+    delimiter: ""

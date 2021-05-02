@@ -1,0 +1,9 @@
+tests:
+  - name: test rows mapping
+    target_mapping: './process_row_test.blobl'
+    environment: {}
+    input_batch:
+      - content: |
+          {"name": "john's ", "age": "10"}
+    output_batches:
+      - - content_equals: "INSERT INTO table(name, age) VALUES ('john''s', 10)"

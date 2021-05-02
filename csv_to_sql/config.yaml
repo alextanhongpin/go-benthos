@@ -1,27 +1,33 @@
+# Only logs error
+logger:
+  level: ERROR
+  format: classic # Option: logfmt, classic, json
+
 input:
-  generate:
-    mapping: |
-      #root = {"name": "jane", "age": "-10"}
-      root = {"name": "jessie", "age": "-10"}
-    count: 1
+  csv:
+    paths: ["./*.csv"]
+    parse_header_row: true
+    delimiter: ','
 
 pipeline:
   processors:
-    - bloblang: |
-        root = match {
-          # Skip rows that has name jane.
-          this.name == "jane" => deleted(),
+    - resource: row_proc
 
-          # Validate that the number is positive.
-          this.age.number() < 0 => throw("negative number"),
-
-          # Success.
-          _ => "INSERT INTO table(name, age) VALUES ('%s', %s)".format(
-            this.name.not_empty(),
-            this.age.not_empty().number().string()
-          )
-        }
+processor_resources:
+  - label: row_proc
+    bloblang: |
+      import "./process_row.blobl"
+      root = this.apply("process_row")
 
 output:
-  stdout:
-    delimiter: ""
+  switch:
+    cases:
+      # Skip if there is error.
+      - check: errored()
+        output:
+          stdout:
+            delimiter: ""
+      - output:
+          file:
+            path: "./out.sql"
+            codec: "lines"
